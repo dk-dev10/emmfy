@@ -40,7 +40,7 @@ function checkPrevNext(btn) {
   counterPage.textContent = countPage;
 }
 
-select.addEventListener('change', (e) => {
+select.addEventListener('change', async (e) => {
   limitPage = e.target.value ? e.target.value : 5;
   fetchDealsLimited();
 });
@@ -120,7 +120,7 @@ async function fetchDealsLimited() {
     setTimeout(() => {
       requestCount = 0;
       fetchDealsLimited();
-    }, 1000); // задержка 1 секунда
+    }, 1000);
   }
 }
 
