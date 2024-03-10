@@ -7,32 +7,54 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <table id="dealsTable">
-      <thead>
-        <tr>
-          <th>Название сделки</th>
-          <th>Бюджет</th>
-          <th>Дата создания</th>
-          <th>Дата изменения</th>
-          <th>Ответственный</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <div class="container">
+      <header>
+        <div>
+          <label for="pet-select">Количество: </label>
+          <select id="pet-select">
+            <option value="5">5</option>
+            <option value="2">2</option>
+            <option value="10">10</option>
+            <option value="all">All</option>
+          </select>
+        </div>
+        <div class="sort">
+          <h3>Сортировать по:</h3>
 
-    <script
-      class="amocrm_oauth"
-      charset="utf-8"
-      data-client-id="33c8ef63-44c3-477d-8d77-3d4b1bc7d399"
-      data-title="Button"
-      data-compact="false"
-      data-class-name="className"
-      data-color="default"
-      data-state="state"
-      data-error-callback="functionName"
-      data-mode="popup"
-      src="https://www.amocrm.ru/auth/button.min.js"
-    ></script>
+          <label for="name">
+            <span> названию </span>
+            <input
+              type="radio"
+              id="name"
+              name="contact"
+              value="name"
+              checked="checked"
+            />
+          </label>
+          <label for="price">
+            <span>цене</span>
+            <input type="radio" id="price" name="contact" value="price" />
+          </label>
+        </div>
+        <div class="btns">
+          <button class="prev" disabled id="prev">&#8701;</button>
+          <div id="counterPage">1</div>
+          <button class="next" id="next">&#8702;</button>
+        </div>
+      </header>
+      <table id="dealsTable">
+        <thead>
+          <tr>
+            <th>Название сделки</th>
+            <th>Бюджет</th>
+            <th>Дата создания</th>
+            <th>Дата изменения</th>
+            <th>Ответственный</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
     <script src="main.js"></script>
   </body>
 </html>

@@ -3,22 +3,76 @@ let accessToken =
 
 let api_endpoint =
   'https://cors-anywhere.herokuapp.com/https://devkuba.amocrm.ru/api/v4/leads';
+// https://cors-anywhere.herokuapp.com/  перейти нажать кнопку для прокси
 
-let pageSize = 5;
-let currentPage = 1;
+const select = document.querySelector('select');
+const prev = document.querySelector('#prev');
+const next = document.querySelector('#next');
+const counterPage = document.querySelector('#counterPage');
+const sortInputs = document.querySelectorAll('.sort  input');
+
+let nextPage = true;
+let prevPage = false;
+let countPage = 1;
+let limitPage = 5;
+let leads = [];
+let sorting = 'name';
+
+function sortLead() {
+  if (sorting === 'name') {
+    leads.sort((a, b) => a.name.localeCompare(b.name));
+  } else {
+    leads.sort((a, b) => a[sorting] - b[sorting]);
+  }
+  renderDeals(leads);
+}
+
+sortInputs.forEach((inp) => {
+  inp.addEventListener('click', (e) => {
+    sorting = e.target.value;
+    sortLead();
+  });
+});
+
+function checkPrevNext(btn) {
+  prev.disabled = btn?.prev ? false : true;
+  next.disabled = btn?.next ? false : true;
+  counterPage.textContent = countPage;
+}
+
+select.addEventListener('change', (e) => {
+  limitPage = e.target.value ? e.target.value : 5;
+  fetchDealsLimited();
+});
+
+prev.addEventListener('click', () => {
+  countPage -= 1;
+  fetchDealsLimited();
+});
+next.addEventListener('click', () => {
+  countPage += 1;
+  fetchDealsLimited();
+});
 
 async function getDeals() {
-  const response = await fetch(
-    `${api_endpoint}?limit=${pageSize}&page=${currentPage}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
-  const data = await response.json();
-  console.log(data._embedded.leads);
-  return data._embedded.leads;
+  try {
+    const response = await fetch(
+      `${api_endpoint}?limit=${limitPage}&page=${countPage}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const data = await response.json();
+
+    checkPrevNext(data._links);
+
+    return data._embedded.leads;
+  } catch (e) {
+    console.log(e);
+    return [];
+  }
 }
 
 function renderDeals(deals) {
@@ -38,9 +92,9 @@ function renderDeals(deals) {
 }
 
 function formatTimestamp(timestamp) {
-  const date = new Date(timestamp * 1000); // умножаем на 1000, так как timestamp обычно в секундах, а Date требует миллисекунды
+  const date = new Date(timestamp * 1000);
   const day = date.getDate();
-  const month = date.getMonth() + 1; // добавляем 1, так как месяцы в JavaScript начинаются с 0
+  const month = date.getMonth() + 1;
   const year = date.getFullYear();
   const hours = date.getHours();
   const minutes = date.getMinutes();
@@ -52,7 +106,8 @@ function formatTimestamp(timestamp) {
 
 async function fetchDealsWithDelay() {
   const deals = await getDeals();
-  renderDeals(deals);
+  leads = deals;
+  renderDeals(leads);
 }
 
 let requestCount = 0;
@@ -69,22 +124,23 @@ async function fetchDealsLimited() {
   }
 }
 
-// fetchDealsLimited();
+fetchDealsLimited();
 
 function getToken() {
-  const client_id = '33c8ef63-44c3-477d-8d77-3d4b1bc7d399';
+  const client_id = 'd16f2d4a-1b08-465d-9765-4541e34af422';
   const client_secret =
-    'eamr1ChZFLjPkAds9hD79RuDeVSh349mbsi8GtEWHOzagVoBMViJzadJztVdrCeI';
-  const redirect_uri = 'https://dk-dev10.github.io/emmfy';
+    'oR0Ajg3ys1bGW01fjCO9eywodX5wcJUCF4Yq60acm18EXcvQDEoXr1rkFUIKO7Ou';
+  const redirect_uri = 'http://localhost:5500';
   const code =
-    'def50200e21ac8ad61e2a559339248103abce9e4bcf8c057f53f486434226d8274551b7532f04d44ab1b9b80b58b713d2208ebcba861e5b1ab83c7789a76832211e296cc6ee9339da33e5e50851e9b3c916809869849a8e7deb1e87a1f60f922dc6bf6de1a66b8972dea98993968f6018c3149fd7d171017bac98446b95a0e30384890ea7b27cf3e311beadfc7921c5b67dfa09226d03a08824613da1504f7bf25bbd007aee6020c543f26616b35dbd021b6ee0b82967fd154176e72b07e38ceb0ce90a81e2662e2d6860726eb9ce5bdde89588ffe0f649fdff69d7c09b839e6ce9d57342b76265d7e19e69d4c5eb66e043676816241c5bcd2943fc7fc894fe10c035081d0b2a23d210f9ce6aac66df06d2b7c69e09c1a6ce9fbbb47e5fc225097726702a44c9ac87a2255c6be90ab5a5b27915fe8e4aa628e36fe978b81b727513331aa1fc22e0717e1efc6c6c73ef1c3cc1ee362d1dd289f43f3f32e7baae4722e5e0179e731d1b94647ce946526ba49e465bf6c84000facb8eacd56beb5c7db03888ba64e4b85f6540b5d53c26193c6b5d4f2bfc0bdc09cc3f4a3b056ff424ec0d69d5c8011455b408736fc375f34a1bf6f5ac826cad4e0d5afba655aba350b84cc7715d62f3ca98789ce1839eaeef5eb7c435d7f7569f72f37fe5b4a21799a096cab3be11d7a2d65fae653b3a941d000';
+    'def5020024520c566cbd4fea5e7c97ac422b93ed61c5dabd655fae3b785843cb6b695a4c2dbf4237195fc19fbd71580f024eac63a6358860f832ec8be9368c7fdddfe77f45c814f59704a869ccbd2a61dfb40e00d154986148766f3f032d3cc3bc40779dfef1114133edca8faaf96d1e3b545c106d69b88672347065262a90e942e530da17d68e4648567339ee42a99df70c29b47f49bb1702ef7b0b66e33979d8c2ad517055777322574142681cc5bf9cce38d1753ae53053530d0b963443960d1aac516d8ca8adbc479542a21f393333ee966c54b633a3a088f8f79cf7c5a0cf77fdde528bdc9e86b86b51ffea1feac8756624d75223e5856b5031c736cec94464d618fb9606392ef925ed4c3ab245b8e72770693ef999e9292f2c63fa12acba24d59a0dcd2a784b241df8199bad1241293380b2542aaa266cbda28002f641859c1aaa2feb5706e0d1c3922f2276bdb605cb6260d352c421249d35dda1f20996af231765644968b841978368f3d2e9e2958ec9800206b15d0aea58fd8dd1dfc9574908013c860825b654e4bf63814339c430dfb7992613f9e4b41176ef54a1f7e8fa995bcf33ac928d4d45f5413bfa088d3a774c1932e9d6c6e72e24d744299bb4a08620e9d33faa6489de668406b0a689aa91d1c1f6e1f6238e41ca4f301b47c6af082cda';
 
-  let data = new URLSearchParams();
-  data.append('client_id', client_id);
-  data.append('client_secret', client_secret);
-  data.append('redirect_uri', redirect_uri);
-  data.append('code', code);
-  data.append('grant_type', 'authorization_code');
+  const data = {
+    client_id: client_id,
+    client_secret: client_secret,
+    grant_type: 'authorization_code',
+    code: code,
+    redirect_uri: redirect_uri,
+  };
 
   fetch(
     'https://cors-anywhere.herokuapp.com/https://devkuba.amocrm.ru/oauth2/access_token',
@@ -92,12 +148,12 @@ function getToken() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Context-User-ID': '31621254',
       },
       body: JSON.stringify(data),
     }
   )
     .then((response) => response.json())
-    .then((data) => console.log('data:', data))
     .catch((error) => {
       console.error('Error:', error);
     });
